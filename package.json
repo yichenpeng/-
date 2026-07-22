@@ -1,1 +1,14 @@
+{
+  "name": "bus-marquee-system",
+  "version": "1.0.0",
+  "description": "公車跑馬燈與下車鈴系統",
+  "main": "server/server.js",
+  "scripts": {
+    "start": "node server/server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "socket.io": "^4.7.5"
+  }
+}
 
