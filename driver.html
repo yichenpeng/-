@@ -1,1 +1,49 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <title>司機控制台</title>
+    <style>
+        body { background: #222; color: white; font-family: sans-serif; padding: 20px; max-width: 500px; margin: auto; }
+        input, select, button { width: 100%; padding: 12px; margin: 10px 0; font-size: 1.1rem; box-sizing: border-box; }
+        button { background: #00b386; color: white; border: none; cursor: pointer; font-weight: bold; }
+        button:hover { background: #008860; }
+    </style>
+</head>
+<body>
+    <h2>駕駛員控制台</h2>
+    
+    <label>選擇下一站：</label>
+    <select id="stop-select">
+        <option value="台北車站">台北車站</option>
+        <option value="台大醫院">台大醫院</option>
+        <option value="中正紀念堂">中正紀念堂</option>
+        <option value="古亭站">古亭站</option>
+    </select>
+    <button onclick="updateStop()">更新下一站</button>
+
+    <hr style="margin: 30px 0;">
+
+    <label>更改跑馬燈宣導文字：</label>
+    <input type="text" id="marquee-input" value="防疫期間，請留意自身健康狀況。">
+    <button onclick="updateMarquee()">更新跑馬燈內容</button>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+
+        function updateStop() {
+            const stop = document.getElementById('stop-select').value;
+            socket.emit('update-bus-info', { nextStop: stop });
+            alert('已更新下一站為：' + stop);
+        }
+
+        function updateMarquee() {
+            const text = document.getElementById('marquee-input').value;
+            socket.emit('update-bus-info', { marquee: text });
+            alert('已更新跑馬燈宣導！');
+        }
+    </script>
+</body>
+</html>
 
