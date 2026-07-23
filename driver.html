@@ -43,13 +43,14 @@
     <div class="container">
         <h2>🚌 駕駛員控制台 (進階導航與廣播版)</h2>
         
+        <!-- 🌟 GPS 自動導航狀態面板 (已補回) -->
         <div class="gps-panel">
             <h3>📍 GPS 自動導航狀態</h3>
             <p id="gpsStatus">目前狀態：未開啟 GPS 追蹤</p>
             <button id="toggleGpsBtn" style="background-color: #17a2b8; width: 100%;">開啟 GPS 自動到站追蹤</button>
         </div>
 
-        <!-- 🌟 新增：跑馬燈公告輸入區 -->
+        <!-- 跑馬燈公告輸入區 -->
         <div class="announcement-panel">
             <h3>📢 跑馬燈多媒體廣播設定</h3>
             <div class="input-row">
@@ -78,13 +79,12 @@
     <script>
         const socket = io();
         let stations = [];
-        let announcements = []; // 儲存廣播訊息陣列
+        let announcements = [];
         let watchId = null;
         let currentActiveIndex = 0;
 
-        // GPS 離站判定專用變數
-        let hasEnteredStation = false; // 紀錄是否曾經進入過 < 500 公尺範圍
-        let minDistanceRecorded = Infinity; // 紀錄在當前站點測得的最近距離
+        let hasEnteredStation = false;
+        let minDistanceRecorded = Infinity;
 
         const stationNickname = document.getElementById('stationNickname');
         const stationAddress = document.getElementById('stationAddress');
@@ -99,7 +99,6 @@
         const addAnnouncementBtn = document.getElementById('addAnnouncementBtn');
         const announcementList = document.getElementById('announcementList');
 
-        // 初始化拖拉排序
         document.addEventListener('DOMContentLoaded', () => {
             Sortable.create(stationList, {
                 animation: 150,
@@ -124,13 +123,12 @@
                     }
 
                     renderStations();
-                    resetStationTracking(); // 重新排序後重置距離判定
+                    resetStationTracking();
                     autoSync();
                 }
             });
         });
 
-        // 新增公告/疫情資訊
         addAnnouncementBtn.addEventListener('click', () => {
             const text = announcementInput.value.trim();
             if (!text) {
@@ -164,7 +162,6 @@
             });
         }
 
-        // 新增站點
         addBtn.addEventListener('click', async () => {
             const nickname = stationNickname.value.trim();
             const address = stationAddress.value.trim();
@@ -271,13 +268,11 @@
             }
         });
 
-        // 重置當前站點的進出站判定狀態
         function resetStationTracking() {
             hasEnteredStation = false;
             minDistanceRecorded = Infinity;
         }
 
-        // 🌟 核心距離與進離站、提示詞邏輯判斷
         function checkDistanceAndLogic(lat1, lon1) {
             if (stations.length === 0) return;
 
@@ -290,19 +285,17 @@
             if (dist < 500) {
                 prefix = "即將到站: ";
                 isApproaching = true;
-                hasEnteredStation = true; // 標記已經進入過 <500公尺 範圍
+                hasEnteredStation = true;
                 if (dist < minDistanceRecorded) {
-                    minDistanceRecorded = dist; // 記錄最近距離
+                    minDistanceRecorded = dist;
                 }
             }
 
-            // 離站判定：曾經小於500公尺，且目前距離比記錄到的最近距離多出 30 公尺以上（代表車子開走了、開始變遠）
             if (hasEnteredStation && dist > minDistanceRecorded + 30) {
                 if (currentActiveIndex < stations.length - 1) {
-                    currentActiveIndex++; // 自動跳到下一站
+                    currentActiveIndex++;
                     resetStationTracking();
                     renderStations();
-                    console.log("已離站，自動切換至下一站索引:", currentActiveIndex);
                 }
             }
 
@@ -322,7 +315,6 @@
 
         function deg2rad(deg) { return deg * (Math.PI / 180); }
 
-        // 🌟 傳送完整狀態給伺服器（包含站點、目前索引、自訂廣播清單與當前字首前綴）
         function autoSync(prefix = "下一站: ", isApproaching = false) {
             socket.emit('update-stations', {
                 stations: stations,
