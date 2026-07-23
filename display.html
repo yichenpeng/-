@@ -54,15 +54,7 @@
             border-bottom: 2px dashed #440000; padding-bottom: 14px;
         }
 
-        /* 下車鈴橫幅：蓋在最上層，任何時候有人按鈴就會出現 */
-        .bell-banner {
-            display: none;
-            font-size: 34px; font-weight: bold; color: #fff; background: #cc0000;
-            padding: 16px; margin-bottom: 16px; border-radius: 10px; text-align: center;
-        }
-        .bell-banner.active { display: block; animation: bellFlash 0.5s infinite alternate; }
-        @keyframes bellFlash { from { background: #cc0000; } to { background: #ff3333; } }
-
+        
         /*
           ★ 統一顯示器：報站資訊（下一站 / 即將到站）與政令宣導共用同一個跑馬燈區域，
           不再分成兩列。距離 <=500 公尺（即將到站）時，此區會被強制接管，優先權最高。
@@ -111,13 +103,14 @@
         }
 
         .route-preview {
-            margin-top: 18px;
-            font-size: 18px;
-            color: #662200;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
+    font-size: 16px;
+    color: #662200;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1; /* 讓路線文字自動縮減空間 */
+    margin-right: 15px;
+}
     </style>
 </head>
 <body>
@@ -127,13 +120,15 @@
             <div class="panel">
                 <h1>🚌 本次行駛路線與即時資訊</h1>
 
-                <div class="bell-banner" id="bellBanner">🔔 有乘客按鈴，請準備停靠 🔔</div>
-
                 <div class="main-display">
-                    <div class="display-text" id="displayText">歡迎搭乘，祝您旅途愉快</div>
-                </div>
+    <div class="display-text" id="displayText">歡迎搭乘，祝您旅途愉快</div>
+</div>
 
-                <div class="route-preview" id="previewText">完整路線：尚未載入</div>
+<!-- 修正：將 route-preview 改為左右兩欄，右側放下車鈴標示 -->
+<div class="route-preview-container" style="display: flex; justify-content: space-between; align-items: center; margin-top: 12px;">
+    <div class="route-preview" id="previewText" style="margin-top: 0;">完整路線：尚未載入</div>
+    <div id="bellIndicator" style="display: none; color: #ff3333; font-weight: bold; background: #330000; padding: 2px 8px; border-radius: 4px; border: 1px solid #ff3333;">🔔 下車鈴ing</div>
+</div>
             </div>
         </div>
     </div>
@@ -166,7 +161,7 @@
         const socket = io();
 
         const previewText = document.getElementById('previewText');
-        const bellBanner = document.getElementById('bellBanner');
+       const bellIndicator = document.getElementById('bellIndicator'); // 抓取右側標示
         const mainDisplay = document.querySelector('.main-display');
         const displayTextEl = document.getElementById('displayText');
 
@@ -187,7 +182,14 @@
             targetIndex = data.targetIndex || 0;
             stationPhase = data.stationPhase || 'next';
             announcements = data.announcements || [];
-            if (data.bellActive) bellBanner.classList.add('active');
+            
+            // 改為控制右側標示的顯示與隱藏
+            if (data.bellActive) {
+                bellIndicator.style.display = 'block';
+            } else {
+                bellIndicator.style.display = 'none';
+            }
+
             renderPreview();
             applyForcedStateIfNeeded();
             if (!isForced) restartRotation();
@@ -207,8 +209,14 @@
             if (!isForced) restartRotation();
         });
 
-        socket.on('bell-ring', () => bellBanner.classList.add('active'));
-        socket.on('bell-clear', () => bellBanner.classList.remove('active'));
+        // 改為控制右側標示
+        socket.on('bell-ring', () => {
+            bellIndicator.style.display = 'block';
+        });
+
+        socket.on('bell-clear', () => {
+            bellIndicator.style.display = 'none';
+        });
 
         function renderPreview() {
             if (!stations || stations.length === 0) {
