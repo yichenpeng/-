@@ -27,13 +27,14 @@
             box-sizing: border-box;
         }
 
-        .frame {
-            width: 100%; height: 100%;
-            box-sizing: border-box;
-            padding: 40px;
-            display: flex;
-            flex-direction: column;
-        }
+       .frame {
+    width: 100%; height: 100%;
+    box-sizing: border-box;
+    padding: 120px 40px; /* 上下留白加大，外框就會變矮 */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
 
         .panel {
             flex: 1;
@@ -67,24 +68,26 @@
           不再分成兩列。距離 <=500 公尺（即將到站）時，此區會被強制接管，優先權最高。
         */
         .main-display {
-            flex: 1;
-            margin-top: 6px;
-            background: #0a0a0a;
-            border: 2px solid #330000;
-            border-radius: 10px;
-            overflow: hidden;
-            position: relative;
-            display: flex;
-            align-items: center;
-        }
+    flex: 1;
+    min-height: 110px; /* 限制最小高度 */
+    max-height: 130px; /* 限制最大高度，外框就不會太高 */
+    margin-top: 4px;
+    background: #0a0a0a;
+    border: 2px solid #330000;
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    align-items: center;
+}
         .display-text {
-            font-size: 68px;
-            font-weight: bold;
-            color: #ffaa00;
-            white-space: nowrap;
-            padding-left: 30px;
-            text-shadow: 0 0 12px rgba(255, 170, 0, 0.6);
-        }
+    font-size: 48px; /* 將字體等比調小，外框變矮後才不會超出邊界 */
+    font-weight: bold;
+    color: #ffaa00;
+    white-space: nowrap;
+    padding-left: 30px;
+    text-shadow: 0 0 12px rgba(255, 170, 0, 0.6);
+}
         .display-text.scrolling {
             position: absolute;
             will-change: transform;
