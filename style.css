@@ -35,4 +35,4 @@ body {
 }
 li { background: #fff; border: 1px solid #ddd; margin-bottom: 8px; padding: 10px; display: flex; justify-content: space-between; align-items: center; border-radius: 4px; cursor: grab; }
 li:active { cursor: grabbing; }
-.drag-handle { cursor: ns-resize; color: #888; font-size: 20px; padding: 0 5px; user-select: none; }
+
