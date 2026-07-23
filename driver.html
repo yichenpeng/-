@@ -21,18 +21,21 @@
         li { background: #fff; border: 1px solid #ddd; margin-bottom: 8px; padding: 10px; display: flex; justify-content: space-between; align-items: center; border-radius: 4px; transition: background-color 0.2s; }
         li.active-station { border: 2px solid #007bff; background-color: #e8f4fd; }
 
-        /* 🌟 1. 按住拖拉時的「被拿起」反應特效（半透明、浮動陰影） */
+        /* 🌟 嚴格限制拖拉時的樣式與寬度，防止左右亂跑 */
         li.sortable-ghost {
-            opacity: 0.4;
+            opacity: 0.3;
             background: #e2e8f0;
         }
         li.sortable-chosen {
-            background: #fff3cd; /* 輕微變黃表示被選中 */
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            background: #fff3cd;
         }
         li.sortable-drag {
-            background: #ffffff;
+            background: #ffffff !important;
             box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+            box-sizing: border-box !important;
+            /* 強制鎖死被拖拉時的寬度與清單一致，不准左右飄移 */
+            width: auto !important;
+            max-width: 100% !important;
         }
 
         .station-info { font-size: 14px; color: #666; margin-top: 4px; }
@@ -90,8 +93,9 @@
             Sortable.create(stationList, {
                 animation: 150,          // 拖拉放開時的滑順動畫 (毫秒)
                 handle: '.drag-handle',  // 只能拉左邊的 "☰" 圖示
-                direction: 'vertical',   // 🌟 2. 嚴格限制只能在垂直軌道內移動，寬度鎖死在清單範圍內
-                forceFallback: true,     // 強制使用內建拖拉模式，確保跨瀏覽器行為一致且不會亂飄出畫面
+                direction: 'vertical',   // 限制垂直方向
+                lockAxis: 'y',           // 🌟 強制鎖死 Y 軸，絕對禁止左右移動！
+                forceFallback: true,     // 使用內建 Fallback 確保樣式與軸向鎖定有效
                 onEnd: function (evt) {
                     const oldIndex = evt.oldIndex;
                     const newIndex = evt.newIndex;
